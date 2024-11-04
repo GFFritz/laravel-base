@@ -12,6 +12,5 @@ class RolesTableSeeder extends Seeder
         // Criação de papéis
         Role::create(['name' => 'admin']);
         Role::create(['name' => 'moderator']);
-        Role::create(['name' => 'user']);
     }
 }

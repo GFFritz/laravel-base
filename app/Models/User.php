@@ -27,6 +27,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role_id',
+        'reset_token',
     ];
 
     /**
@@ -40,6 +42,7 @@ class User extends Authenticatable
         'two_factor_recovery_codes',
         'two_factor_secret',
         'role_id',
+        'reset_token',
     ];
 
     /**

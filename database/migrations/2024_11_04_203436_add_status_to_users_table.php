@@ -4,19 +4,19 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddRoleIdToUsersTable extends Migration
+class AddStatusToUsersTable extends Migration
 {
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->foreignId('role_id')->default(1)->change()->constrained()->onDelete('cascade')->after('id');
+            $table->boolean('status')->default(1); // 1: Ativo, 0: Inativo
         });
     }
 
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('role_id');
+            $table->dropColumn('status');
         });
     }
 }
