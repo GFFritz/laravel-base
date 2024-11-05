@@ -1,6 +1,8 @@
 <?php
-// app/Http/Controllers/PasswordController.php
-namespace App\Http\Controllers;
+
+namespace App\Http\Controllers\Dashboard;
+
+use App\Http\Controllers\Controller;
 
 use App\Models\User;
 use Illuminate\Http\Request;
