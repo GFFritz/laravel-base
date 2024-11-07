@@ -1,3 +1,32 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+#suggestions {
+    max-height: 200px; /* Altura máxima para a lista de sugestões */
+    overflow-y: auto;  /* Scroll se exceder a altura máxima */
+    border: 1px solid #ccc; /* Fronteira para definir a lista */
+    z-index: 1000; /* Certificar que esteja na frente */
+}
+
+#suggestions li {
+    padding: 10px; /* Espaçamento dentro de cada item */
+    cursor: pointer; /* Muda o cursor ao passar sobre as sugestões */
+}
+
+#suggestions li:hover {
+    background-color: #f0f0f0; /* Cor de fundo ao passar o mouse */
+}
+
+#clear-search {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2em;
+    padding: 0;
+    color: #999; /* Cor do "X" */
+}
+
+#clear-search:hover {
+    color: #f00; /* Muda para vermelho ao passar o mouse */
+}
