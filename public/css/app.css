@@ -1621,6 +1621,10 @@ select {
   width: 75%;
 }
 
+.w-36 {
+  width: 9rem;
+}
+
 .w-4 {
   width: 1rem;
 }
@@ -1655,18 +1659,6 @@ select {
 
 .w-full {
   width: 100%;
-}
-
-.w-40 {
-  width: 10rem;
-}
-
-.w-32 {
-  width: 8rem;
-}
-
-.w-36 {
-  width: 9rem;
 }
 
 .min-w-0 {

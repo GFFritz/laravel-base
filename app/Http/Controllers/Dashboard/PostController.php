@@ -50,7 +50,6 @@ class PostController extends Controller
             'title' => 'required|string|max:255',
             'author' => 'required|string|max:255',
             'content' => 'required|string',
-            'is_featured' => 'boolean', // Tornar este campo opcional
             'categories' => 'array',
         ]);
 
@@ -84,7 +83,6 @@ class PostController extends Controller
             'title' => 'required|string|max:255',
             'author' => 'required|string|max:255',
             'content' => 'required|string',
-            'is_featured' => 'boolean',
             'categories' => 'array',
         ]);
 
