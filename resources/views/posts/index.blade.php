@@ -13,9 +13,9 @@
         </div>
         <div class="flex justify-between my-4">
 
-            <div class="relative w-64"> <!-- Contêiner relativo -->
+            <div class="relative w-64">
                 <input type="text" id="title-search" placeholder="Filtrar pelo título"
-                    class="border rounded px-2 py-1 w-full">
+                    class="border rounded px-2 py-1 w-full" autocomplete="off">
 
                 <!-- Botão de Limpar Busca -->
                 <button id="clear-search" class="absolute right-0 top-0 mt-1 mr-1 text-gray-500">
@@ -111,7 +111,8 @@
                     $('#suggestions').removeClass('hidden'); // Mostra a lista de sugestões
                     filteredTitles.forEach(title => {
                         $('#suggestions').append(
-                            `<li class="p-2 hover:bg-gray-200 cursor-pointer">${title}</li>`);
+                            `<li class="p-2 hover:bg-gray-200 cursor-pointer">${title}</li>`
+                        );
                     });
                 } else {
                     $('#suggestions').addClass(

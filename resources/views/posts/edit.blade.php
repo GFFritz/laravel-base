@@ -6,7 +6,6 @@
     </x-slot>
 
     <div class="container mx-auto mt-5">
-        <!-- Criar e Editar Post -->
         @if ($errors->any())
             <div class="bg-red-100 text-red-600 p-4 rounded mb-4">
                 <ul>
@@ -16,24 +15,25 @@
                 </ul>
             </div>
         @endif
-        <form action="{{ route('posts.update', $post) }}" method="POST" id="postForm">
+
+        <form action="{{ route('posts.update', $post) }}" method="POST" id="postForm" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             <div class="mb-4">
                 <label class="block text-gray-700">Título</label>
-                <input type="text" name="title" value="{{ $post->title }}" required
+                <input type="text" name="title" value="{{ old('title', $post->title) }}" required
                     class="border rounded w-full px-3 py-2" placeholder="Digite o título">
             </div>
 
             <div class="mb-4">
                 <label class="block text-gray-700">Autor</label>
-                <input type="text" name="author" value="{{ $post->author }}" required
+                <input type="text" name="author" value="{{ old('author', $post->author) }}" required
                     class="border rounded w-full px-3 py-2" placeholder="Nome do Autor">
             </div>
 
             <div class="mb-4">
                 <label class="block text-gray-700">Conteúdo</label>
-                <textarea name="content" class="ckeditor border rounded w-full px-3 py-2" required>{{ $post->content }}</textarea>
+                <textarea name="content" class="ckeditor border rounded w-full px-3 py-2" required>{{ old('content', $post->content) }}</textarea>
             </div>
 
             <div class="mb-4">
@@ -58,9 +58,46 @@
             <button type="submit" class="btn btn-primary">Atualizar</button>
         </form>
 
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/ckeditor5/41.4.2/ckeditor.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/ckeditor5/41.4.2/translations/pt-br.min.js"></script>
         <script>
             ClassicEditor
-                .create(document.querySelector('.ckeditor'))
+                .create(document.querySelector('.ckeditor'), {
+                    ckfinder: {
+                        uploadUrl: '/dashboard/upload-image',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        }
+                    },
+                    language: {
+                        // The UI will be English.
+                        ui: 'pt-br',
+
+                        // But the content will be edited in Arabic.
+                        content: 'pt-br'
+                    },
+                    menuBar: {
+                        isVisible: true
+                    },
+                    toolbar: {
+                        items: [
+                            'undo', 'redo',
+                            '|',
+                            'heading',
+                            '|',
+                            'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor',
+                            '|',
+                            'bold', 'italic', 'strikethrough', 'subscript', 'superscript', 'code',
+                            '|',
+                            'link', 'uploadImage', 'blockQuote', 'codeBlock',
+                            '|',
+                            'alignment',
+                            '|',
+                            'bulletedList', 'numberedList', 'todoList', 'outdent', 'indent'
+                        ],
+                        shouldNotGroupWhenFull: true
+                    }
+                })
                 .then(editor => {
                     const form = document.getElementById('postForm');
                     form.addEventListener('submit', () => {
@@ -69,19 +106,52 @@
                             writer.set(editor.model.document.getRoot(), data);
                         });
                     });
+
+                    // Configuração para lidar com o upload de imagem
+                    editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
+                        return {
+                            upload: () => {
+                                return new Promise((resolve, reject) => {
+                                    const data = new FormData();
+                                    loader.file.then(file => {
+                                        data.append('upload', file);
+                                        fetch('{{ route('upload.image') }}', {
+                                                method: 'POST',
+                                                body: data,
+                                                headers: {
+                                                    'X-CSRF-TOKEN': '{{ csrf_token() }}' // Incluindo o token CSRF
+                                                }
+                                            })
+                                            .then(response => {
+                                                if (response.ok) {
+                                                    return response
+                                                        .json(); // Processando resposta
+                                                }
+                                                throw new Error('Falha na requisição: ' +
+                                                    response.statusText);
+                                            })
+                                            .then(result => {
+                                                if (result.url) {
+                                                    resolve({
+                                                        default: result
+                                                            .url // O formato que o CKEditor espera
+                                                    });
+                                                } else {
+                                                    reject('URL de imagem não retornada');
+                                                }
+                                            })
+                                            .catch(err => {
+                                                reject(err.message);
+                                            });
+                                    });
+                                });
+                            }
+                        };
+                    };
                 })
                 .catch(error => {
-                    console.error(error);
+                    console.error('Erro durante a inicialização do CKEditor:', error);
                 });
         </script>
     </div>
-
-    <script src="https://cdn.ckeditor.com/ckeditor5/35.0.1/classic/ckeditor.js"></script>
-    <script>
-        ClassicEditor
-            .create(document.querySelector('.ckeditor'))
-            .catch(error => {
-                console.error(error);
-            });
-    </script>
 </x-app-layout>

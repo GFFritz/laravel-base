@@ -54,9 +54,46 @@
             <button type="submit" class="btn btn-primary">Salvar</button>
         </form>
 
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/ckeditor5/41.4.2/ckeditor.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/ckeditor5/41.4.2/translations/pt-br.min.js"></script>
         <script>
             ClassicEditor
-                .create(document.querySelector('.ckeditor'))
+                .create(document.querySelector('.ckeditor'), {
+                    ckfinder: {
+                        uploadUrl: '/dashboard/upload-image',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        }
+                    },
+                    language: {
+                        // The UI will be English.
+                        ui: 'pt-br',
+
+                        // But the content will be edited in Arabic.
+                        content: 'pt-br'
+                    },
+                    menuBar: {
+                        isVisible: true
+                    },
+                    toolbar: {
+                        items: [
+                            'undo', 'redo',
+                            '|',
+                            'heading',
+                            '|',
+                            'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor',
+                            '|',
+                            'bold', 'italic', 'strikethrough', 'subscript', 'superscript', 'code',
+                            '|',
+                            'link', 'uploadImage', 'blockQuote', 'codeBlock',
+                            '|',
+                            'alignment',
+                            '|',
+                            'bulletedList', 'numberedList', 'todoList', 'outdent', 'indent'
+                        ],
+                        shouldNotGroupWhenFull: true
+                    }
+                })
                 .then(editor => {
                     const form = document.getElementById('postForm');
                     form.addEventListener('submit', () => {
@@ -65,19 +102,51 @@
                             writer.set(editor.model.document.getRoot(), data);
                         });
                     });
+
+                    // Configuração para lidar com o upload de imagem
+                    editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
+                        return {
+                            upload: () => {
+                                return new Promise((resolve, reject) => {
+                                    const data = new FormData();
+                                    loader.file.then(file => {
+                                        data.append('upload', file);
+                                        fetch('{{ route('upload.image') }}', {
+                                                method: 'POST',
+                                                body: data,
+                                                headers: {
+                                                    'X-CSRF-TOKEN': '{{ csrf_token() }}' // Incluindo o token CSRF
+                                                }
+                                            })
+                                            .then(response => {
+                                                if (response.ok) {
+                                                    return response
+                                                        .json(); // Processando resposta
+                                                }
+                                                throw new Error('Falha na requisição: ' +
+                                                    response.statusText);
+                                            })
+                                            .then(result => {
+                                                if (result.url) {
+                                                    resolve({
+                                                        default: result
+                                                            .url // O formato que o CKEditor espera
+                                                    });
+                                                } else {
+                                                    reject('URL de imagem não retornada');
+                                                }
+                                            })
+                                            .catch(err => {
+                                                reject(err.message);
+                                            });
+                                    });
+                                });
+                            }
+                        };
+                    };
                 })
                 .catch(error => {
-                    console.error(error);
+                    console.error('Erro durante a inicialização do CKEditor:', error);
                 });
         </script>
-    </div>
-
-    <script src="https://cdn.ckeditor.com/ckeditor5/35.0.1/classic/ckeditor.js"></script>
-    <script>
-        ClassicEditor
-            .create(document.querySelector('.ckeditor'))
-            .catch(error => {
-                console.error(error);
-            });
-    </script>
 </x-app-layout>

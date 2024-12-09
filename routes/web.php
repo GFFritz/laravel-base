@@ -6,6 +6,7 @@ use App\Http\Controllers\Dashboard\UserController;
 use App\Http\Controllers\Dashboard\PasswordController;
 use App\Http\Controllers\Front\HomeController;
 use App\Http\Controllers\Dashboard\PostController;
+use App\Http\Controllers\Dashboard\UploadController;
 
 Route::get('/', [HomeController::class, 'index']);
 
@@ -29,7 +30,11 @@ Route::middleware(['auth', 'admin'])->prefix('dashboard')->group(function () {
 
     // Rotas de recurso Categories
     Route::resource('categories', CategoryController::class);
+
+    // Route de upload de imagens
+    Route::post('/upload-image', [UploadController::class, 'uploadImage'])->name('upload.image');
 });
+
 
 Route::get('/password/create/{token}', function ($token) {
     return view('passwords.create', ['token' => $token]); // Crie a view correspondente
